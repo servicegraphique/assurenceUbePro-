@@ -3920,9 +3920,9 @@ function closeNav() {
         sous_question_champ.addClass('d-block');
         sous_question_champ.removeClass('d-none');
       }
-      let sous_question_check = champ.find('div.check-list');
+      let sous_question_check = champ.find('div.check-list').not('.check-sous-sous');
       if (sous_question_check !== undefined)
-      {      
+      {     
         sous_question_check.addClass('d-block');
         sous_question_check.removeClass('d-none');
       }
@@ -3936,19 +3936,49 @@ function closeNav() {
           sous_question_champ.addClass('d-none');
           sous_question_champ.removeClass('d-block');
         }
-        let sous_question_check = champ.find('div.check-list');
+        let sous_question_check = champ.find('div.check-list').not('.check-sous-sous');
         if (sous_question_check !== undefined)
-        {      
+        {     
           sous_question_check.addClass('d-none');
           sous_question_check.removeClass('d-block');
           sous_question_check.find('input.check-condition-list').each (function() {
-              if ($(this).is(':checked')){          	
+              if ($(this).is(':checked')){         	
+              $(this).prop('checked', false)
+            }
+          });
+        }
+        let sous_sous = champ.find('div.check-sous-sous');
+        if (sous_sous !== undefined)
+        {
+          sous_sous.addClass('d-none');
+          sous_sous.removeClass('d-block');
+          sous_sous.find('input.check-condition-list').each (function() {
+              if ($(this).is(':checked')){         	
               $(this).prop('checked', false)
             }
           });
         }
     }
 });
+  /* Affichage du sous-sous-formulaire "Vous êtes" (Protection Sociale du dirigeant) :
+     visible uniquement si au moins une option (Complémentaire Santé, Prévoyance, Epargne retraite) est cochée */
+  $('.check-condition-list').on('change', function(){
+    let block = $(this).closest('div.check-content-condition');
+    let sousSous = block.find('div.check-sous-sous');
+    if (sousSous.length === 0) return;
+    let premiereListe = block.find('div.check-list').not('.check-sous-sous');
+    let uneOptionCochee = premiereListe.find('input.check-condition-list').filter(':checked').length > 0;
+    if (uneOptionCochee){
+      sousSous.addClass('d-block');
+      sousSous.removeClass('d-none');
+    } else {
+      sousSous.addClass('d-none');
+      sousSous.removeClass('d-block');
+      sousSous.find('input.check-condition-list').each(function(){
+        if ($(this).is(':checked')){ $(this).prop('checked', false); }
+      });
+    }
+  });
   $('.rcm-radio-condition').click(function(){
  	    let champ = $(this).parent().closest('div');      
       if($(this).is(':checked'))
